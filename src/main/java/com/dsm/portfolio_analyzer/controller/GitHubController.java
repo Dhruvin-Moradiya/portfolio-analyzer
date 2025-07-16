@@ -1,6 +1,7 @@
 package com.dsm.portfolio_analyzer.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -38,5 +39,11 @@ public class GitHubController {
             @RequestParam(required = false, defaultValue = "desc") String order,
             @RequestParam(required = false) String language) {
         return gitHubService.getUserRepos(username, sort, order, language);
+    }
+
+    @GetMapping("/{username}/stats")
+    public Map<String, Object> getUserRepoStats(@PathVariable String username) {
+        List<GitHubRepo> repos = gitHubService.getUserRepos(username);
+        return gitHubService.getRepoStats(repos);
     }
 }

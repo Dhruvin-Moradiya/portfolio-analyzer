@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Comparator;
 import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -77,5 +79,20 @@ public class GitHubService {
             }
         }
         return repos;
+    }
+
+    public Map<String, Object> getRepoStats(List<GitHubRepo> repos) {
+        Map<String, Integer> byLanguage = new HashMap<>();
+        for (GitHubRepo repo : repos) {
+            String lang = repo.getLanguage();
+            if (lang != null && !lang.isBlank()) {
+                byLanguage.put(lang, byLanguage.getOrDefault(lang, 0) + 1);
+            }
+        }
+        
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalRepos", repos.size());
+        stats.put("byLanguage", byLanguage);
+        return stats;
     }
 }
