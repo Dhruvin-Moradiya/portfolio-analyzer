@@ -32,7 +32,11 @@ public class GitHubController {
     }
 
     @GetMapping("/{username}/repos")
-    public List<GitHubRepo> getUserRepos(@PathVariable String username) {
-        return gitHubService.getUserRepos(username);
+    public List<GitHubRepo> getUserRepos(
+            @PathVariable String username,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false, defaultValue = "desc") String order,
+            @RequestParam(required = false) String language) {
+        return gitHubService.getUserRepos(username, sort, order, language);
     }
 }

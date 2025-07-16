@@ -2,6 +2,8 @@ package com.dsm.portfolio_analyzer.service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -40,5 +42,40 @@ public class GitHubService {
 
         GitHubRepo[] repos = restTemplate.getForObject(url, GitHubRepo[].class);
         return Arrays.asList(repos != null ? repos : new GitHubRepo[0]);
+    }
+
+    public List<GitHubRepo> getUserRepos(String username, String sort, String order, String language) {
+        List<GitHubRepo> repos = getUserRepos(username);
+
+        // Filter by language
+        if (language != null && !language.isBlank()) {
+            repos = repos.stream()
+                .filter(r -> r.getLanguage() != null && r.getLanguage().equalsIgnoreCase(language))
+                .collect(Collectors.toList());
+        }
+
+        // Sort
+        if (sort != null && !sort.isBlank()) {
+            Comparator<GitHubRepo> comparator = null;
+            switch (sort) {
+                case "stars":
+                    comparator = Comparator.comparingInt(GitHubRepo::getStars);
+                    break;
+                case "createdAt":
+                    comparator = Comparator.comparing(GitHubRepo::getCreatedAt, Comparator.nullsLast(String::compareTo));
+                    break;
+                case "name":
+                    comparator = Comparator.comparing(GitHubRepo::getName, Comparator.nullsLast(String::compareToIgnoreCase));
+                    break;
+            }
+            if (comparator != null) {
+                if (order != null && order.equalsIgnoreCase("asc")) {
+                    repos = repos.stream().sorted(comparator).collect(Collectors.toList());
+                } else {
+                    repos = repos.stream().sorted(comparator.reversed()).collect(Collectors.toList());
+                }
+            }
+        }
+        return repos;
     }
 }
