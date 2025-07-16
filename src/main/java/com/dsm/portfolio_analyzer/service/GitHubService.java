@@ -24,6 +24,10 @@ public class GitHubService {
         this.restTemplate = new RestTemplate();
     }
 
+    public GitHubService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
     public GitHubUser getUser(String username) {
         String url = UriComponentsBuilder
             .fromUriString("https://api.github.com/users/" + username)
